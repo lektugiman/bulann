@@ -6,6 +6,28 @@ import crayons
 import json
 import threading
 import urllib.parse
+import hashlib
+import sys
+
+
+original_banner = """\
+ █████  ██     ██ ███████ ███████ ███████  ██████  ██    ██  █████  ██████  
+██   ██ ██     ██ ██           ██ ██      ██    ██ ██    ██ ██   ██ ██   ██  
+███████ ██  █  ██ ███████     ██  ███████ ██    ██ ██    ██ ███████ ██   ██  
+██   ██ ██ ███ ██      ██    ██        ██ ██ ▄▄ ██ ██    ██ ██   ██ ██   ██  
+██   ██  ███ ███  ███████    ██   ███████  ██████   ██████  ██   ██ ██████   
+"""
+
+def get_banner_hash():
+    
+    return hashlib.sha256(original_banner.encode()).hexdigest()
+
+def verify_banner():
+
+    current_banner_hash = get_banner_hash()
+    if current_banner_hash != get_banner_hash():
+        log(level="ERROR")
+        sys.exit(1)
 
 def is_url_encoded(url):
     decoded_url = urllib.parse.unquote(url)
@@ -16,12 +38,7 @@ def url_decode(encoded_url):
     return urllib.parse.unquote(encoded_url)
 
 def _print_banner():
-    print(crayons.green(' █████  ██     ██ ███████ ███████ ███████  ██████  ██    ██  █████  ██████  '))
-    print(crayons.green('██   ██ ██     ██ ██           ██ ██      ██    ██ ██    ██ ██   ██ ██   ██  '))
-    print(crayons.green('███████ ██  █  ██ ███████     ██  ███████ ██    ██ ██    ██ ███████ ██   ██  '))
-    print(crayons.green('██   ██ ██ ███ ██      ██    ██        ██ ██ ▄▄ ██ ██    ██ ██   ██ ██   ██  '))
-    print(crayons.green('██   ██  ███ ███  ███████    ██   ███████  ██████   ██████  ██   ██ ██████   '))
-    print()
+    print(crayons.green(original_banner))
     print(crayons.green("Moonbix"))
 
 def log(message, level="INFO"):
@@ -188,14 +205,15 @@ def run_account(index, token, proxy=None):
 
 if __name__ == '__main__':
     os.system('cls' if os.name == 'nt' else 'clear')
+    verify_banner()  # Memeriksa apakah banner tidak berubah
     _print_banner()
-    
+
     proxies = [line.strip() for line in open('proxy.txt') if line.strip()]
     tokens = [line.strip() for line in open('data.txt')]
 
     threads = []
-    
-    log("==== Starting ===", level="SUCCESS")  
+
+    log("==== Memulai ===", level="SUCCESS")  
     while True:
         for index, token in enumerate(tokens, start=1):
             proxy = proxies[(index - 1) % len(proxies)] if proxies else None
@@ -206,5 +224,5 @@ if __name__ == '__main__':
         for t in threads:
             t.join()
 
-        log("All accounts have been completed.", level="SUCCESS")
+        log("Semua akun telah selesai.", level="SUCCESS")
         sleep(2000)
